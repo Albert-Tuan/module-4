@@ -27,10 +27,10 @@ async function bootstrap() {
     .setTitle('Task Management API')
     .setDescription('API quản lý tasks với PostgreSQL + Redis cache')
     .setVersion('1.0')
-    .addTag('Tasks', 'Quản lý công việc')
     .addTag('Auth', 'Xác thực người dùng')
     .addTag('Users', 'Quản lý người dùng')
     .addTag('Projects', 'Quản lý dự án')
+    .addTag('Tasks', 'Quản lý công việc')
     .addBearerAuth()
     .build();
 
