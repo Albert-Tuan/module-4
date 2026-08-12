@@ -1,6 +1,7 @@
 import { IsString, IsNotEmpty, IsOptional, IsEnum, IsDateString, IsUUID } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Priority } from '@prisma/client';
+
+const PriorityValues = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
 
 export class CreateTaskDto {
   @ApiProperty({ description: 'Tiêu đề task', example: 'Thiết kế database' })
@@ -13,10 +14,10 @@ export class CreateTaskDto {
   @IsOptional()
   description?: string;
 
-  @ApiPropertyOptional({ enum: Priority, default: Priority.MEDIUM })
-  @IsEnum(Priority, { message: 'Priority phải là LOW, MEDIUM, HIGH hoặc URGENT' })
+  @ApiPropertyOptional({ enum: PriorityValues, default: 'MEDIUM' })
+  @IsEnum(PriorityValues, { message: 'Priority phải là LOW, MEDIUM, HIGH hoặc URGENT' })
   @IsOptional()
-  priority?: Priority;
+  priority?: string;
 
   @ApiPropertyOptional({ description: 'Hạn hoàn thành', example: '2026-12-31T00:00:00.000Z' })
   @IsDateString({}, { message: 'Deadline phải là định dạng ngày hợp lệ' })

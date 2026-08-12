@@ -17,14 +17,12 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskFilterDto } from './dto/task-filter.dto';
-import { TaskStatus } from '@prisma/client';
 
 @ApiTags('Tasks')
 @Controller('tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
-  // POST /tasks — Tạo task mới
   @Post()
   @ApiOperation({ summary: 'Tạo task mới' })
   @ApiResponse({ status: 201, description: 'Task đã được tạo thành công' })
@@ -33,7 +31,6 @@ export class TasksController {
     return this.tasksService.create(createTaskDto);
   }
 
-  // GET /tasks — Lấy danh sách tasks (có filter)
   @Get()
   @ApiOperation({ summary: 'Lấy danh sách tasks' })
   @ApiResponse({ status: 200, description: 'Danh sách tasks' })
@@ -41,7 +38,6 @@ export class TasksController {
     return this.tasksService.findAll(filter);
   }
 
-  // GET /tasks/:id — Lấy chi tiết 1 task
   @Get(':id')
   @ApiOperation({ summary: 'Lấy chi tiết task theo ID' })
   @ApiParam({ name: 'id', description: 'Task ID (UUID)' })
@@ -51,7 +47,6 @@ export class TasksController {
     return this.tasksService.findOne(id);
   }
 
-  // PUT /tasks/:id — Cập nhật task
   @Put(':id')
   @ApiOperation({ summary: 'Cập nhật thông tin task' })
   @ApiParam({ name: 'id', description: 'Task ID (UUID)' })
@@ -64,7 +59,6 @@ export class TasksController {
     return this.tasksService.update(id, updateTaskDto);
   }
 
-  // PATCH /tasks/:id/status — Đổi trạng thái task
   @Patch(':id/status')
   @ApiOperation({ summary: 'Cập nhật trạng thái task' })
   @ApiParam({ name: 'id', description: 'Task ID (UUID)' })
@@ -72,12 +66,11 @@ export class TasksController {
   @ApiResponse({ status: 404, description: 'Task không tồn tại' })
   updateStatus(
     @Param('id', ParseUUIDPipe) id: string,
-    @Body('status') status: TaskStatus,
+    @Body('status') status: string,
   ) {
     return this.tasksService.updateStatus(id, status);
   }
 
-  // PATCH /tasks/:id/assign — Gán task cho user
   @Patch(':id/assign')
   @ApiOperation({ summary: 'Gán task cho user' })
   @ApiParam({ name: 'id', description: 'Task ID (UUID)' })
@@ -90,7 +83,6 @@ export class TasksController {
     return this.tasksService.assignTask(id, assigneeId);
   }
 
-  // DELETE /tasks/:id — Xóa task
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Xóa task' })

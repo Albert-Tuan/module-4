@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { TaskStatus, Priority } from '@prisma/client';
 
-// Entity class mô tả cấu trúc response của Task
+const TaskStatusValues = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'];
+const PriorityValues = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+
 export class TaskEntity {
   @ApiProperty({ description: 'ID duy nhất của task' })
   id: string;
@@ -12,11 +13,11 @@ export class TaskEntity {
   @ApiPropertyOptional({ description: 'Mô tả chi tiết' })
   description: string | null;
 
-  @ApiProperty({ enum: TaskStatus, description: 'Trạng thái hiện tại' })
-  status: TaskStatus;
+  @ApiProperty({ enum: TaskStatusValues, description: 'Trạng thái hiện tại' })
+  status: string;
 
-  @ApiProperty({ enum: Priority, description: 'Mức độ ưu tiên' })
-  priority: Priority;
+  @ApiProperty({ enum: PriorityValues, description: 'Mức độ ưu tiên' })
+  priority: string;
 
   @ApiPropertyOptional({ description: 'Hạn hoàn thành' })
   deadline: Date | null;
