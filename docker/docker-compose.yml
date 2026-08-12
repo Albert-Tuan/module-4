@@ -1,6 +1,9 @@
 version: '3.8'
 
 services:
+  # ==========================================
+  # NestJS Application
+  # ==========================================
   app:
     build:
       context: ..
@@ -8,33 +11,69 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/mydb
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/module4_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis_secret
+      - JWT_SECRET=jwt_super_secret_key
+      - NODE_ENV=development
     depends_on:
       - postgres
       - redis
     networks:
       - app-network
+    restart: unless-stopped
 
+  # ==========================================
+  # PostgreSQL Database
+  # ==========================================
   postgres:
-    image: postgres:15-alpine
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=mydb
+      - POSTGRES_DB=module4_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    restart: unless-stopped
 
+  # ==========================================
+  # Redis Cache
+  # ==========================================
   redis:
     image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass redis_secret
+    volumes:
+      - redis_data:/data
     networks:
       - app-network
+    restart: unless-stopped
+
+  # ==========================================
+  # Adminer - Web UI quản lý database
+  # ==========================================
+  adminer:
+    image: adminer
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    depends_on:
+      - postgres
+    networks:
+      - app-network
+    restart: unless-stopped
 
 networks:
   app-network:
+    driver: bridge
 
 volumes:
   postgres_data:
+  redis_data:
