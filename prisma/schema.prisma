@@ -21,6 +21,7 @@ model User {
   role      Role     @default(MEMBER)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   // Relations
   projects  ProjectMember[]
