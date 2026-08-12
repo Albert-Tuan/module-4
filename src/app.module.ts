@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { AppCacheModule } from './cache/cache.module';
 import { TasksModule } from './tasks/tasks.module';
 import { AuthModule } from './auth/auth.module';
+import { ProjectsModule } from './projects/projects.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
 
     // Feature Modules
     AuthModule,
+    ProjectsModule,
     TasksModule,
   ],
 })
