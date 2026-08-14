@@ -125,6 +125,14 @@ npm run docker:up        # Start Docker containers
 npm run docker:down      # Stop Docker containers
 ```
 
+## Thành viên nhóm
+
+- Đặng Tuấn Anh
+- Lê Huy Trường
+- Nguyễn Thành Nam
+- Trần Gia Bình
+- Hoàng Hiếu
+
 ## Phân công nhóm
 
 | Người | Module | Nhánh |
