@@ -1,18 +1,19 @@
 import { IsOptional, IsEnum, IsUUID } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { TaskStatus, Priority } from '@prisma/client';
 
-// DTO để filter/lọc danh sách tasks
+const TaskStatusValues = ['TODO', 'IN_PROGRESS', 'REVIEW', 'DONE'] as const;
+const PriorityValues = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'] as const;
+
 export class TaskFilterDto {
-  @ApiPropertyOptional({ enum: TaskStatus, description: 'Lọc theo trạng thái' })
-  @IsEnum(TaskStatus)
+  @ApiPropertyOptional({ enum: TaskStatusValues, description: 'Lọc theo trạng thái' })
+  @IsEnum(TaskStatusValues)
   @IsOptional()
-  status?: TaskStatus;
+  status?: string;
 
-  @ApiPropertyOptional({ enum: Priority, description: 'Lọc theo mức độ ưu tiên' })
-  @IsEnum(Priority)
+  @ApiPropertyOptional({ enum: PriorityValues, description: 'Lọc theo mức độ ưu tiên' })
+  @IsEnum(PriorityValues)
   @IsOptional()
-  priority?: Priority;
+  priority?: string;
 
   @ApiPropertyOptional({ description: 'Lọc theo project' })
   @IsUUID('4')

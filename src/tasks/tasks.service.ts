@@ -3,7 +3,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskFilterDto } from './dto/task-filter.dto';
-import { TaskStatus } from '@prisma/client';
 
 @Injectable()
 export class TasksService {
@@ -11,11 +10,9 @@ export class TasksService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // Tạo task mới
   async create(createTaskDto: CreateTaskDto) {
     this.logger.log(`Tạo task mới: ${createTaskDto.title}`);
 
-    // Kiểm tra project tồn tại
     const project = await this.prisma.project.findUnique({
       where: { id: createTaskDto.projectId },
     });
@@ -23,7 +20,6 @@ export class TasksService {
       throw new NotFoundException(`Project với ID ${createTaskDto.projectId} không tồn tại`);
     }
 
-    // Kiểm tra assignee tồn tại (nếu có)
     if (createTaskDto.assigneeId) {
       const user = await this.prisma.user.findUnique({
         where: { id: createTaskDto.assigneeId },
@@ -37,7 +33,7 @@ export class TasksService {
       data: {
         title: createTaskDto.title,
         description: createTaskDto.description,
-        priority: createTaskDto.priority,
+        priority: createTaskDto.priority || 'MEDIUM',
         deadline: createTaskDto.deadline ? new Date(createTaskDto.deadline) : null,
         projectId: createTaskDto.projectId,
         assigneeId: createTaskDto.assigneeId,
@@ -49,7 +45,6 @@ export class TasksService {
     });
   }
 
-  // Lấy danh sách tasks với bộ lọc
   async findAll(filter: TaskFilterDto) {
     this.logger.log('Lấy danh sách tasks');
 
@@ -72,7 +67,6 @@ export class TasksService {
     });
   }
 
-  // Lấy chi tiết 1 task theo ID
   async findOne(id: string) {
     this.logger.log(`Lấy task: ${id}`);
 
@@ -91,14 +85,11 @@ export class TasksService {
     return task;
   }
 
-  // Cập nhật task
   async update(id: string, updateTaskDto: UpdateTaskDto) {
     this.logger.log(`Cập nhật task: ${id}`);
 
-    // Kiểm tra task tồn tại
     await this.findOne(id);
 
-    // Kiểm tra assignee mới tồn tại (nếu có)
     if (updateTaskDto.assigneeId) {
       const user = await this.prisma.user.findUnique({
         where: { id: updateTaskDto.assigneeId },
@@ -108,12 +99,14 @@ export class TasksService {
       }
     }
 
+    const updateData: any = { ...updateTaskDto };
+    if (updateTaskDto.deadline) {
+      updateData.deadline = new Date(updateTaskDto.deadline);
+    }
+
     return this.prisma.task.update({
       where: { id },
-      data: {
-        ...updateTaskDto,
-        deadline: updateTaskDto.deadline ? new Date(updateTaskDto.deadline) : undefined,
-      },
+      data: updateData,
       include: {
         project: { select: { id: true, name: true } },
         assignee: { select: { id: true, name: true, email: true } },
@@ -121,11 +114,9 @@ export class TasksService {
     });
   }
 
-  // Cập nhật trạng thái task
-  async updateStatus(id: string, status: TaskStatus) {
+  async updateStatus(id: string, status: string) {
     this.logger.log(`Đổi status task ${id} → ${status}`);
 
-    // Kiểm tra task tồn tại
     await this.findOne(id);
 
     return this.prisma.task.update({
@@ -138,14 +129,11 @@ export class TasksService {
     });
   }
 
-  // Gán task cho user
   async assignTask(id: string, assigneeId: string) {
     this.logger.log(`Gán task ${id} cho user ${assigneeId}`);
 
-    // Kiểm tra task tồn tại
     await this.findOne(id);
 
-    // Kiểm tra user tồn tại
     const user = await this.prisma.user.findUnique({
       where: { id: assigneeId },
     });
@@ -163,11 +151,9 @@ export class TasksService {
     });
   }
 
-  // Xóa task
   async remove(id: string) {
     this.logger.log(`Xóa task: ${id}`);
 
-    // Kiểm tra task tồn tại
     await this.findOne(id);
 
     return this.prisma.task.delete({

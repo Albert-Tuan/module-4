@@ -1,11 +1,10 @@
-import { PrismaClient, Role, ProjectRole, TaskStatus, Priority } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('🌱 Bắt đầu seed dữ liệu...');
 
-  // Xóa dữ liệu cũ (thứ tự quan trọng vì foreign keys)
   await prisma.task.deleteMany();
   await prisma.projectMember.deleteMany();
   await prisma.project.deleteMany();
@@ -13,15 +12,12 @@ async function main() {
 
   console.log('🗑️  Đã xóa dữ liệu cũ.');
 
-  // ==========================================
-  // Tạo Users
-  // ==========================================
   const admin = await prisma.user.create({
     data: {
       email: 'admin@example.com',
       name: 'Admin User',
-      password: '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Kz1Md7Lgx2R1dFg7f8PSu', // hashed 'password123'
-      role: Role.ADMIN,
+      password: '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Kz1Md7Lgx2R1dFg7f8PSu',
+      role: 'ADMIN',
     },
   });
 
@@ -30,7 +26,7 @@ async function main() {
       email: 'member1@example.com',
       name: 'Nguyễn Văn A',
       password: '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Kz1Md7Lgx2R1dFg7f8PSu',
-      role: Role.MEMBER,
+      role: 'MEMBER',
     },
   });
 
@@ -39,15 +35,12 @@ async function main() {
       email: 'member2@example.com',
       name: 'Trần Thị B',
       password: '$2b$10$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36Kz1Md7Lgx2R1dFg7f8PSu',
-      role: Role.MEMBER,
+      role: 'MEMBER',
     },
   });
 
   console.log('👤 Đã tạo 3 users.');
 
-  // ==========================================
-  // Tạo Projects
-  // ==========================================
   const project1 = await prisma.project.create({
     data: {
       name: 'Website Bán Hàng',
@@ -66,31 +59,25 @@ async function main() {
 
   console.log('📁 Đã tạo 2 projects.');
 
-  // ==========================================
-  // Thêm Members vào Projects
-  // ==========================================
   await prisma.projectMember.createMany({
     data: [
-      { userId: admin.id, projectId: project1.id, role: ProjectRole.OWNER },
-      { userId: member1.id, projectId: project1.id, role: ProjectRole.MEMBER },
-      { userId: member2.id, projectId: project1.id, role: ProjectRole.MEMBER },
-      { userId: member1.id, projectId: project2.id, role: ProjectRole.OWNER },
-      { userId: member2.id, projectId: project2.id, role: ProjectRole.MEMBER },
+      { userId: admin.id, projectId: project1.id, role: 'OWNER' },
+      { userId: member1.id, projectId: project1.id, role: 'MEMBER' },
+      { userId: member2.id, projectId: project1.id, role: 'MEMBER' },
+      { userId: member1.id, projectId: project2.id, role: 'OWNER' },
+      { userId: member2.id, projectId: project2.id, role: 'MEMBER' },
     ],
   });
 
   console.log('👥 Đã thêm members vào projects.');
 
-  // ==========================================
-  // Tạo Tasks
-  // ==========================================
   await prisma.task.createMany({
     data: [
       {
         title: 'Thiết kế database schema',
         description: 'Thiết kế ERD và tạo Prisma schema cho dự án',
-        status: TaskStatus.DONE,
-        priority: Priority.HIGH,
+        status: 'DONE',
+        priority: 'HIGH',
         deadline: new Date('2025-12-31'),
         projectId: project1.id,
         assigneeId: admin.id,
@@ -98,8 +85,8 @@ async function main() {
       {
         title: 'Xây dựng API Authentication',
         description: 'Implement register, login, JWT token',
-        status: TaskStatus.IN_PROGRESS,
-        priority: Priority.HIGH,
+        status: 'IN_PROGRESS',
+        priority: 'HIGH',
         deadline: new Date('2026-01-15'),
         projectId: project1.id,
         assigneeId: member1.id,
@@ -107,8 +94,8 @@ async function main() {
       {
         title: 'Tạo giao diện trang chủ',
         description: 'Design và code trang chủ responsive',
-        status: TaskStatus.TODO,
-        priority: Priority.MEDIUM,
+        status: 'TODO',
+        priority: 'MEDIUM',
         deadline: new Date('2026-02-01'),
         projectId: project1.id,
         assigneeId: member2.id,
@@ -116,16 +103,16 @@ async function main() {
       {
         title: 'Setup CI/CD Pipeline',
         description: 'Cấu hình GitHub Actions cho auto deploy',
-        status: TaskStatus.TODO,
-        priority: Priority.LOW,
+        status: 'TODO',
+        priority: 'LOW',
         projectId: project1.id,
         assigneeId: null,
       },
       {
         title: 'Thiết kế UI/UX Mobile App',
         description: 'Wireframe và mockup cho ứng dụng mobile',
-        status: TaskStatus.REVIEW,
-        priority: Priority.URGENT,
+        status: 'REVIEW',
+        priority: 'URGENT',
         deadline: new Date('2026-01-10'),
         projectId: project2.id,
         assigneeId: member2.id,
